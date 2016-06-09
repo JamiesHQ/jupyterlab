@@ -14,6 +14,9 @@ declare module CodeMirror {
     function fromTextArea(host: HTMLTextAreaElement, options?: EditorConfiguration): CodeMirror.EditorFromTextArea;
 
 
+    function runMode(text: string, modespec: modespec, node: HTMLElement): void;
+
+
     // findMode* functions are from loading the codemirror/mode/meta module
     interface modespec {
       name: string;

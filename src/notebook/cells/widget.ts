@@ -222,7 +222,7 @@ class BaseCellWidget extends Widget {
    * Focus the widget.
    */
   focus(): void {
-    this.editor.editor.focus();
+    this._input.focus();
   }
 
   /**
@@ -519,14 +519,19 @@ class InputAreaWidget extends Widget {
    */
   constructor(editor: CellEditorWidget) {
     super();
+    this._editor = editor;
     this.addClass(INPUT_CLASS);
     editor.addClass(EDITOR_CLASS);
+    editor.hide();
     this.layout = new PanelLayout();
     let prompt = new Widget();
     prompt.addClass(PROMPT_CLASS);
+    let rendered = this._rendered = new Widget();
+    editor.render(rendered.node);
     let layout = this.layout as PanelLayout;
     layout.addChild(prompt);
     layout.addChild(editor);
+    layout.addChild(rendered);
   }
 
   /**
@@ -540,4 +545,29 @@ class InputAreaWidget extends Widget {
     let text = `In [${value || ' '}]:`;
     prompt.node.textContent = text;
   }
+
+  /**
+   * Focus the input area editor
+   */
+  focus(): void {
+    if (this._editor.isHidden) {
+      this._rendered.hide();
+      this._editor.show();
+    }
+    this._editor.editor.focus();
+    setTimeout(()=>{this.blur()}, 5000);
+
+  }
+
+  /**
+   * Blur the renderer
+   */
+  blur(): void {
+    this._editor.render(this._rendered.node);
+    this._editor.hide();
+    this._rendered.show();
+  }
+
+  private _editor: CellEditorWidget;
+  private _rendered: Widget;
 }

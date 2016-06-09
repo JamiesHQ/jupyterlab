@@ -10,6 +10,7 @@ import * as CodeMirror
   from 'codemirror';
 
 import 'codemirror/mode/meta';
+import 'codemirror/addon/runmode/runmode';
 
 import 'codemirror/lib/codemirror.css';
 
@@ -58,8 +59,16 @@ class CodeMirrorWidget extends Widget {
    * This is a ready-only property.
    */
    get editor(): CodeMirror.Editor {
+     // make sure the actual editor is displayed
      return this._editor;
    }
+
+   /**
+    * Render the current editor to a DOM node
+    */
+  render(node: HTMLElement) {
+    CodeMirror.runMode(this._editor.getDoc().getValue(), this._editor.getOption("mode"), node);
+  }
 
   /**
    * A message handler invoked on an `'after-attach'` message.
@@ -87,12 +96,17 @@ class CodeMirrorWidget extends Widget {
    * A message handler invoked on an `'resize'` message.
    */
   protected onResize(msg: ResizeMessage): void {
-    if (msg.width < 0 || msg.height < 0) {
-      this._editor.refresh();
-    } else {
-      this._editor.setSize(msg.width, msg.height);
-    }
+    if (this.isVisible) {
+      if (msg.width < 0 || msg.height < 0) {
+        this._editor.refresh();
+        console.log(`resize codemirror`);
+      } else {
+        this._editor.setSize(msg.width, msg.height);
+        console.log(`force set size on codemirror`)
+
+      }
     this._needsRefresh = false;
+    }
   }
 
   private _editor: CodeMirror.Editor = null;
